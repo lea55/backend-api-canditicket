@@ -1,0 +1,244 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model User {
+//   id        Int      @id @default(autoincrement())
+//   name      String
+//   surName   String
+//   email     String
+//   password  String
+//   userName  String
+//   role      Role[]
+//   roleId    Int
+//   event  Event?
+//   enable    Boolean
+//   profileImage String
+//   deviceID    String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+model User {
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  surName               String
+  email                 String
+  password              String
+  userName              String
+  phoneNumber           String
+  role    Role @relation(fields: [roleId], references: [id])
+  roleId  Int
+  product               Product[]
+  event                 Event?
+  enable                Boolean
+  profileImage          String
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  organization          Organization[]
+  eventFavorite         EventFavorite[]
+  followersOrganization FollowersOrganization[]
+  eventTicket           ConfigTicket[]
+}
+
+
+model Role {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String
+  user        User[]
+}
+
+//Categoria 
+model Category {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String
+  subcategory SubCategory[]
+}
+
+model SubCategory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  event       Event[]
+}
+
+model Status {
+  id          Int    @id @default(autoincrement())
+  Event       Event?
+  name        String
+  description String
+}
+
+model EventFavorite {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   Int
+  createdAt DateTime @default(now())
+}
+
+model FollowersOrganization {
+  id             Int          @id @default(autoincrement())
+  user           User         @relation(fields: [userId], references: [id])
+  userId         Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId Int
+  createdAt      DateTime     @default(now())
+}
+
+model Event {
+  product          Product[]
+  eventTicket      ConfigTicket[]
+  eventFavorite    EventFavorite[]
+  id               Int             @id @default(autoincrement())
+  name             String
+  description      String
+  startDate        DateTime        @default(now())
+  endDate          DateTime        @default(now())
+  location         Location        @relation(fields: [locationId], references: [id])
+  locationId       Int             @unique
+  subcategory      SubCategory     @relation(fields: [subcategoryId], references: [id])
+  subcategoryId    Int             @unique
+  returnPolicy     String
+  public           Boolean
+  active           Boolean
+  enable           Boolean
+  coverImage       String
+  tags             String
+  availableTickets Int
+  minEntryPrice    Int
+  user             User            @relation(fields: [userId], references: [id])
+  userId           Int             @unique
+  eventimage       EventImage[]
+  status           Status          @relation(fields: [statusId], references: [id])
+  statusId         Int             @unique
+  organizador      Organization    @relation(fields: [organizadorId], references: [id])
+  organizadorId    Int             @unique
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model ConfigTicket {
+  id               Int           @id @default(autoincrement())
+  event            Event         @relation(fields: [eventId], references: [id])
+  eventId          Int           @unique
+  user             User          @relation(fields: [userId], references: [id])
+  userId           Int
+  name             String
+  description      String
+  saleChannel      String
+  price            Float
+  quantity         Int
+  enable           Boolean
+  startDate        DateTime      @default(now())
+  EndDate          DateTime      @default(now())
+  visibilityStart  DateTime      @default(now())
+  visibilityEnd    DateTime      @default(now())
+  paymentMethod    PaymentMethod @default(PMMERCPAGO)
+  paymentType      PaymentType   @default(TPAID)
+  chargeType       ChargeType    @default(CTTRANFER)
+  paymentReference String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+enum PaymentMethod {
+  PMMERCPAGO
+  PMPAYPAL
+  PMSTRIPE
+}
+
+enum PaymentType {
+  TFREE
+  TPAID
+}
+
+enum ChargeType {
+  CTTRANFER
+  CTASSUME
+}
+
+model Product {
+  id                Int      @id @default(autoincrement())
+  event             Event    @relation(fields: [eventId], references: [id])
+  eventId           Int      @unique
+  user              User     @relation(fields: [userId], references: [id])
+  userId            Int
+  name              String
+  description       String
+  importantInfo     String
+  saleChannel       String
+  availableQuantity Int
+  imageUrl          String
+  minPurchase       Int
+  maxPurchase       Int
+  price             Float
+  quantity          Int
+  enable            Boolean
+  startDate         DateTime @default(now())
+  EndDate           DateTime @default(now())
+  visibilityStart   DateTime @default(now())
+  visibilityEnd     DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Organization {
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  description           String
+  website               String
+  facebookLink          String
+  imageUrl              String
+  event                 Event[]
+  followersOrganization FollowersOrganization[]
+  user                  User                    @relation(fields: [userId], references: [id])
+  userId                Int                     @unique
+  enable                Boolean
+  profileImage          String
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+}
+
+model EventImage {
+  id       Int    @id @default(autoincrement())
+  event    Event  @relation(fields: [eventId], references: [id])
+  eventId  Int    @unique
+  imageUrl String
+}
+
+model Country {
+  id          Int      @id @default(autoincrement())
+  region      Region[]
+  name        String
+  currency    String
+  countryCode String
+}
+
+model Region {
+  id        Int       @id @default(autoincrement())
+  location  Location?
+  country   Country   @relation(fields: [countryId], references: [id])
+  countryId Int       @unique
+  name      String
+  image     String
+}
+
+model Location {
+  id       Int    @id @default(autoincrement())
+  event    Event?
+  lat      Float
+  lng      Float
+  region   Region @relation(fields: [regionId], references: [id])
+  regionId Int    @unique
+}
