@@ -32,8 +32,8 @@ model User {
   password              String
   userName              String
   phoneNumber           String
-  role    Role @relation(fields: [roleId], references: [id])
-  roleId  Int
+  role                  Role                    @relation(fields: [roleId], references: [id])
+  roleId                Int
   product               Product[]
   event                 Event?
   enable                Boolean
@@ -46,9 +46,8 @@ model User {
   eventTicket           ConfigTicket[]
 }
 
-
 model Role {
-  id          Int           @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   name        String
   description String
   user        User[]
@@ -101,16 +100,15 @@ model Event {
   eventTicket      ConfigTicket[]
   eventFavorite    EventFavorite[]
   id               Int             @id @default(autoincrement())
-  name             String
+  name             String          @unique
   description      String
   startDate        DateTime        @default(now())
   endDate          DateTime        @default(now())
-  location         Location        @relation(fields: [locationId], references: [id])
-  locationId       Int             @unique
-  subcategory      SubCategory     @relation(fields: [subcategoryId], references: [id])
-  subcategoryId    Int             @unique
+  Location         Location?       @relation(fields: [locationId], references: [id])
+  locationId       Int?            @unique
+  Subcategory      SubCategory?    @relation(fields: [subcategoryId], references: [id])
+  subcategoryId    Int?            @unique
   returnPolicy     String
-  public           Boolean
   active           Boolean
   enable           Boolean
   coverImage       String
@@ -120,12 +118,10 @@ model Event {
   user             User            @relation(fields: [userId], references: [id])
   userId           Int             @unique
   eventimage       EventImage[]
-  status           Status          @relation(fields: [statusId], references: [id])
-  statusId         Int             @unique
-  organizador      Organization    @relation(fields: [organizadorId], references: [id])
-  organizadorId    Int             @unique
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  Status           Status?         @relation(fields: [statusId], references: [id])
+  statusId         Int?            @unique
+  Organizador      Organization?   @relation(fields: [organizadorId], references: [id])
+  organizadorId    Int?            @unique
 }
 
 model ConfigTicket {
@@ -148,8 +144,6 @@ model ConfigTicket {
   paymentType      PaymentType   @default(TPAID)
   chargeType       ChargeType    @default(CTTRANFER)
   paymentReference String
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
 }
 
 enum PaymentMethod {
